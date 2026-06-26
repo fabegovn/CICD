@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the code from the repository so the workflow can work on it.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install the chosen Node.js version.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Step 3: Install every dependency for the workspace root, client, and server.
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run the backend test suite. If this fails, the workflow stops here.
+      - name: Run backend tests
+        run: npm run test:server
+
+      # Step 5: Run the frontend test suite. This confirms the UI code still works.
+      - name: Run frontend tests
+        run: npm run test:client
+
+      # Step 6: Build the frontend bundle. A successful build means the app can be packaged for deployment.
+      - name: Build frontend
+        run: npm run build:client
+

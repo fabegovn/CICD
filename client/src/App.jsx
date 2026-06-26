@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
+// In development, the Vite proxy handles "/todos" and "/health".
+// In production, set VITE_API_BASE_URL to your backend URL.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 function App() {
   const [todos, setTodos] = useState([]);
   const [text, setText] = useState('');
@@ -10,7 +14,7 @@ function App() {
     setStatus('Loading todos...');
 
     try {
-      const response = await fetch('/todos');
+      const response = await fetch(`${API_BASE_URL}/todos`);
       const data = await response.json();
       setTodos(data);
       setStatus('');
@@ -31,7 +35,7 @@ function App() {
       return;
     }
 
-    await fetch('/todos', {
+    await fetch(`${API_BASE_URL}/todos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -44,7 +48,7 @@ function App() {
   }
 
   async function handleDeleteTodo(id) {
-    await fetch(`/todos/${id}`, {
+    await fetch(`${API_BASE_URL}/todos/${id}`, {
       method: 'DELETE'
     });
 
@@ -93,4 +97,3 @@ function App() {
 }
 
 export default App;
-

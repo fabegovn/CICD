@@ -186,6 +186,62 @@ For Vercel, you also need these GitHub Secrets:
 If you want a fully automated Vercel deployment, connect your GitHub repo to
 Vercel and point the production build to the `client` folder.
 
+## Vercel Setup
+
+Because this repository is a monorepo, the safest setup is to deploy the
+`client` folder as the Vercel project and keep the backend on a separate host.
+
+### Step 1: Create a Vercel project
+
+1. Sign in to Vercel.
+2. Import this GitHub repository.
+3. In the monorepo settings, set the **Root Directory** to `client`.
+
+Vercel documents that monorepos use a root directory per project, and that you
+select it before deploying. See the Vercel monorepo docs for the dashboard
+workflow. Source: [Vercel Monorepos](https://vercel.com/docs/monorepos)
+
+### Step 2: Confirm build settings
+
+Use these settings for the frontend project:
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+
+These match the Vite app in [client/package.json](./client/package.json), and
+Vercel project configuration lets you override build and output settings when
+needed. Source: [Vercel Project Configuration](https://vercel.com/docs/project-configuration)
+
+### Step 3: Set the production API URL
+
+The frontend now reads `VITE_API_BASE_URL` from the environment in
+[client/src/App.jsx](./client/src/App.jsx).
+
+Set `VITE_API_BASE_URL` in the Vercel project settings to the public URL of
+your backend API.
+
+Why this is needed:
+- local development uses the Vite proxy
+- production needs a real backend URL
+
+### Step 4: Deploy the backend separately
+
+Vercel is great for the frontend, but the current Express backend is a normal
+Node server. To keep this project simple, host the backend on another service
+or convert it to serverless functions later.
+
+### Step 5: Let GitHub trigger deployments
+
+Once the Vercel project is connected to GitHub, each push to the connected
+branch creates a deployment automatically. Source: [Vercel Deployments](https://vercel.com/docs/deployments)
+
+### Step 6: Optional GitHub Actions deploy workflow
+
+If you keep [.github/workflows/deploy.yml](./.github/workflows/deploy.yml), make
+sure the Vercel project is linked correctly and the Vercel token secrets are set.
+This workflow is optional if you use Vercel's Git integration directly.
+
 ## Notes for Beginners
 
 - The todo list lives in memory, so refreshing the server resets it.

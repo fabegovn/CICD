@@ -184,7 +184,7 @@ For Vercel, you also need these GitHub Secrets:
 - `VERCEL_PROJECT_ID`
 
 If you want a fully automated Vercel deployment, connect your GitHub repo to
-Vercel and point the production build to the `client` folder.
+Vercel and keep the root config file in place.
 
 ## Vercel Setup
 
@@ -195,23 +195,25 @@ Because this repository is a monorepo, the safest setup is to deploy the
 
 1. Sign in to Vercel.
 2. Import this GitHub repository.
-3. In the monorepo settings, set the **Root Directory** to `client`.
+3. Let Vercel read the repo config files: [vercel.json](./vercel.json) for the
+   repo root, or [client/vercel.json](./client/vercel.json) if the project root
+   is set to `client`.
 
-Vercel documents that monorepos use a root directory per project, and that you
-select it before deploying. See the Vercel monorepo docs for the dashboard
-workflow. Source: [Vercel Monorepos](https://vercel.com/docs/monorepos)
+Vercel documents monorepo support and project-level configuration. Source:
+[Vercel Monorepos](https://vercel.com/docs/monorepos)
 
 ### Step 2: Confirm build settings
 
 Use these settings for the frontend project:
 
-- Build command: `npm run build`
-- Output directory: `dist`
+- Build command: `npm run build:client`
+- Output directory: `client/dist`
 - Install command: `npm install`
 
-These match the Vite app in [client/package.json](./client/package.json), and
-Vercel project configuration lets you override build and output settings when
-needed. Source: [Vercel Project Configuration](https://vercel.com/docs/project-configuration)
+These values are defined in the Vercel config files, which make the deployment
+consistently use `client/` no matter which project root Vercel is pointed at.
+Source:
+[Vercel Project Configuration](https://vercel.com/docs/project-configuration)
 
 ### Step 3: Set the production API URL
 

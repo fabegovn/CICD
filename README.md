@@ -20,7 +20,8 @@ and a GitHub Actions pipeline.
 ├── server/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       ├── ci.yml
+│       └── deploy.yml
 ├── README.md
 └── package.json
 ```
@@ -149,7 +150,7 @@ Run backend tests
 PASS server/__tests__/app.test.js
 
 Run frontend tests
-PASS client/src/App.test.js
+PASS client/src/App.test.jsx
 
 Build frontend
 vite v5.x.x building for production...
@@ -174,40 +175,7 @@ This option does not need extra GitHub Actions files.
 2. If CI succeeds, a second workflow deploys to Vercel
 3. The deployment uses Vercel secrets stored in GitHub
 
-Use this GitHub Actions file for automatic deployment:
-
-```yaml
-name: Deploy to Vercel
-
-on:
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
-
-jobs:
-  deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build frontend
-        run: npm run build:client
-
-      - name: Deploy to Vercel
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
-```
+The actual workflow lives in [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml).
 
 For Vercel, you also need these GitHub Secrets:
 
@@ -224,4 +192,3 @@ Vercel and point the production build to the `client` folder.
 - The backend and frontend are kept separate so each part can be tested alone.
 - CI catches mistakes early before code is merged.
 - CD uses CI as a gate so deployment only happens after the project passes checks.
-

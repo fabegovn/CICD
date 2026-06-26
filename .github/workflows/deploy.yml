@@ -1,0 +1,42 @@
+name: Deploy to Vercel
+
+on:
+  workflow_run:
+    # This workflow waits until the CI workflow finishes.
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    # Only deploy when CI finished successfully.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the repository code.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node.js so we can run the app build and the Vercel CLI.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Step 3: Install dependencies for the whole workspace.
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Build the frontend so Vercel receives production-ready files.
+      - name: Build frontend
+        run: npm run build:client
+
+      # Step 5: Deploy the built app to Vercel using a secret token.
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx vercel --prod --token "$VERCEL_TOKEN"
+
